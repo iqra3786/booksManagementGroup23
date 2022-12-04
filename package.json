@@ -1,0 +1,29 @@
+{
+  "name": "book-management-project-self",
+  "version": "1.0.0",
+  "description": "book management project-3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/insh007/book-management-project-self.git"
+  },
+  "keywords": [
+    "project-3"
+  ],
+  "author": "Inshad Ali",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/insh007/book-management-project-self/issues"
+  },
+  "homepage": "https://github.com/insh007/book-management-project-self#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.4",
+    "mongoose": "^6.7.3",
+    "nodemon": "^2.0.20"
+  }
+}
