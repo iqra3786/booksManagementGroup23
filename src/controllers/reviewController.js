@@ -22,7 +22,7 @@ const createReview = async function (req, res) {
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "Data is required." })
 
         /*................Destructuring body data....................*/
-        let { reviewedBy, rating } = data;
+        let { reviewedBy, rating, reviewedAt } = data;
 
         /*------------------------Checking fileds are present or not-----------------------------------*/
         if (!rating) { return res.status(400).send({ status: false, message: "rating is required" }) }
@@ -32,6 +32,10 @@ const createReview = async function (req, res) {
 
         /*-------------------------------Validation(Regex)  -----------------------------------*/
         if (!isValidRating(rating)) { return res.status(400).send({ status: false, message: "rating is invalid. Please provide rating between 1 and 5" }) }
+
+        if(reviewedAt){
+            if (!(isValidDate(reviewedAt))) return res.status(400).send({ status: false, message: "Date is invalid. Please provide date in yyyy-mm-dd format for ex: 2014-04-14." })
+        }
 
         /*................Updating review count in bookData...........*/
         let updateBookData = await bookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, { $inc: { reviews: 1 } }, { new: true }).select({ __v: 0 })
