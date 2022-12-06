@@ -1,3 +1,5 @@
+//.................................ImportModules..........................................................................//
+
 const express = require('express')
 const router = express.Router() 
 const userController = require("../controllers/userController");
@@ -23,7 +25,7 @@ router.get("/books/:bookId", middleware.authenticate, bookController.getBooksByI
 /*-------------------------UPDATE BOOKS--------------------------------*/
 router.put("/books/:bookId" , middleware.authenticate, middleware.authorization, bookController.updatebook)
 
-/*-----------------------delete Book-----------------------------------*/
+/*-----------------------Delete Book-----------------------------------*/
 router.delete("/books/:bookId", middleware.authenticate, middleware.authorization ,bookController.deleteBook);
 
 /*------------------------Create Review--------------------------------*/

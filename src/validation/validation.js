@@ -1,3 +1,6 @@
+
+//................................ValidationPart.............................................................................//
+
 const isValidTitle = function (title) {
     const regex = /^(Mr|Mrs|Miss)+$\b/
     return regex.test(title)

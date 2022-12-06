@@ -1,3 +1,5 @@
+//...........................ImportModules......................................................................................................//
+
 const reviewModel = require("../models/reviewModel");
 const bookModel = require("../models/bookModel");
 const mongoose = require("mongoose");
@@ -6,6 +8,7 @@ const { isValidRating, isEmpty } = validation
 const { isValidObjectId } = require("mongoose")
 const moment = require("moment")
 
+//...................................CreateReview...............................................................................................//
 
 const createReview = async function (req, res) {
     try {
@@ -74,6 +77,8 @@ const createReview = async function (req, res) {
     }
 }
 
+//....................................UpdateReview.........................................................................................//
+
 const updateReview = async function (req, res) {
 
     try {
@@ -128,6 +133,8 @@ const updateReview = async function (req, res) {
         return res.status(500).send({ status: false, message: err.message })
     }
 }
+
+//..................................DeleteReview............................................................................................................//
 
 const deleteReview = async function (req, res) {
     try {

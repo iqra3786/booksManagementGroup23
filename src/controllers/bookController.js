@@ -1,3 +1,5 @@
+//................................ImportModules..............................................................................//
+
 const { isValidObjectId } = require("mongoose")
 const bookModel = require("../models/bookModel")
 const userModel = require("../models/userModel")
@@ -5,17 +7,18 @@ const { isEmpty, isValidISBN, isValidDate } = require("../validation/validation"
 const reviewModel = require("../models/reviewModel")
 const moment = require('moment')
 
+//.........................................CreateBook......................................................................//
 
 const createBook = async function (req, res) {
     try {
         let data = req.body
         const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = data
 
-        // IF BODY IS EMPTY.------------------------------------------
+     //--------------------------------------IF BODY IS EMPTY.------------------------------------------
         if (Object.keys(data).length == 0)
             return res.status(400).send({ status: false, message: "Please provide data in request body" })
 
-        // IF VALUES ARE NOT IN BODY.--------------------------------
+        //--------------------------------- IF VALUES ARE NOT IN BODY.--------------------------------
         if (!title)
             return res.status(400).send({ status: false, message: "title is required" })
 
@@ -39,7 +42,7 @@ const createBook = async function (req, res) {
 
         if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "userId is invalid" })
 
-        // IF VALUES ARE EMPTY BY INFO.-------------------------------------
+        //---------------------------------------- IF VALUES ARE EMPTY BY INFO.-------------------------------------
         if (!(isEmpty(title))) return res.status(400).send({ status: false, message: "title is empty" })
         if (!(isEmpty(excerpt))) return res.status(400).send({ status: false, message: "excerpt is empty" })
         if (!(isEmpty(ISBN))) return res.status(400).send({ status: false, message: "ISBN is empty" })
@@ -76,11 +79,14 @@ const createBook = async function (req, res) {
     }
 }
 
+//................................findBookByQueryParams.......................................................................//
+
+
 const allBooks = async function (req, res) {
     try {
         const { userId, category, subcategory } = req.query
 
-        //CREATING AN OBJECT AND DESTRUCTURING.------------------------------------------------------
+//-------------------------------------CREATING AN OBJECT AND DESTRUCTURING.------------------------------------------------------
         let findObj = {
             isDeleted: false,
         }
@@ -95,18 +101,18 @@ const allBooks = async function (req, res) {
             findObj["subcategory"] = subcategory
         }
         
-        //CHECKING IF USER ID VALID OR NOT.---------------------------------------------------------------------
+        //----------------------------------CHECKING IF USER ID VALID OR NOT.---------------------------------------------------------------------
         if (userId) {
             if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "userId is invalid" })
         }
 
-        //SELECTING ONLY THE WANTED DATA.---------------------------------------------------------------------------------
+        //-----------------------------------------SELECTING ONLY THE WANTED DATA.---------------------------------------------------------------------------------
         let data = await bookModel.find(findObj).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 })
 
         /*----------------------Checking if book is present in DB-----------------------*/
         if (data.length == 0) return res.status(404).send({ Status: false, message: 'No Data Found' })
 
-        //SORTING THE DATA ACCORDINGLY TO ALPHABETICAL ORDER OF TITLE.----------------------------------------------------
+        //-------------------------------------SORTING THE DATA ACCORDINGLY TO ALPHABETICAL ORDER OF TITLE.----------------------------------------------------
         data.sort((a, b) => a.title > b.title ? 1 : -1)
 
         res.status(200).send({ status: true, message: "Books list", data: data })
@@ -117,11 +123,13 @@ const allBooks = async function (req, res) {
     }
 }
 
+//.................................GetBookByPathParam........................................................................................................//
+
 const getBooksById = async function (req, res) {
     try {
         let bookId = req.params.bookId;
 
-        //CHECKING IF BOOK ID VALID OR NOT.---------------------------------------------------------------------
+        //--------------------------------CHECKING IF BOOK ID VALID OR NOT.---------------------------------------------------------------------
         if (!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: "bookId is invalid" })
 
         let bookData = await bookModel.findOne({ _id: bookId, isDeleted: false }).select({ ISBN: 0, __v: 0 })
@@ -132,7 +140,7 @@ const getBooksById = async function (req, res) {
 
         let totalReviews = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
 
-        //ADDING TOTALREVIEWS IN REVIEWSDATA HERE.---------------------------------------------------------------
+        //------------------------------ADDING TOTALREVIEWS IN REVIEWSDATA HERE.---------------------------------------------------------------
         let obj = { ...bookData._doc, reviewsData: totalReviews }
 
         res.status(200).send({ status: true, message: "Books list", data: obj })
@@ -141,14 +149,16 @@ const getBooksById = async function (req, res) {
     }
 }
 
+//..............................UpdateBook...................................................................................................//
+
 const updatebook = async function (req, res) {
     try {
         const id = req.params.bookId;
 
-        //CHECKING IF BOOK ID VALID OR NOT.---------------------------------------------------------------------
+        //------------------------------------CHECKING IF BOOK ID VALID OR NOT.---------------------------------------------------------------------
         if (!isValidObjectId(id)) return res.status(400).send({ status: false, message: "userId is invalid" })
 
-        //CHECKING IF BODY IS EMPTY OR CONTAINING MORE THAN 4 ATTRIBUTES.----------------
+        //------------------------------------CHECKING IF BODY IS EMPTY OR CONTAINING MORE THAN 4 ATTRIBUTES.----------------
         const data = req.body;
         let { title, excerpt, releasedAt, ISBN } = data
 
@@ -176,21 +186,21 @@ const updatebook = async function (req, res) {
         if (!findinDB)
             return res.status(404).send({ status: false, message: "No book exist with this bookId." })
 
-        //CHECKING IF DELETED OR NOT------------------------------------------------------------------
+        //-----------------------------------CHECKING IF DELETED OR NOT------------------------------------------------------------------
         if (findinDB.isDeleted == true)
             return res.status(404).send({ status: false, message: "This book is already deleted" })
         
-        //CHECKING TITLE IS ALREADY REGISTERED OR NOT--------------------------------------------------
+        //--------------------------------CHECKING TITLE IS ALREADY REGISTERED OR NOT--------------------------------------------------
         const duplicateTitle = await bookModel.findOne({ title: data.title })
         if (duplicateTitle)
             return res.status(400).send({ status: false, message: "Title is registered already so please put another title" })
 
-        //CHECKING ISBN IS ALREADY REGISTERED OR NOT--------------------------------------------------
+        //------------------------------------CHECKING ISBN IS ALREADY REGISTERED OR NOT--------------------------------------------------
         const duplicateISBN = await bookModel.findOne({ ISBN: data.ISBN })
         if (duplicateISBN)
             return res.status(400).send({ status: false, message: "ISBN is registered already so please put another ISBN" })
 
-        //UPDATING BOOKS HERE -------------------------------------------------------------------------
+        //----------------------------------------UPDATING BOOKS HERE -------------------------------------------------------------------------
         const updatedBooks = await bookModel.findOneAndUpdate({ _id: id },
             {
                 $set: {
@@ -216,14 +226,14 @@ const deleteBook = async function (req, res) {
 
         const bookId = req.params.bookId
 
-        //CHECKING FOR BOOKID IS GIVEN BY USER AND A VALID ID TOO.----------------------------------------
+        //---------------------------------------CHECKING FOR BOOKID IS GIVEN BY USER AND A VALID ID TOO.----------------------------------------
         if (!bookId)
             return res.status(400).send({ status: true, message: "bookId is required" })
 
         if (!isValidObjectId(bookId))
             return res.status(400).send({ status: false, message: "Invalid bookId" })
 
-        //FINDING IN DB THAT BOOK BY ID.------------------------------------------------------------------
+        //-------------------------------------------FINDING IN DB THAT BOOK BY ID.------------------------------------------------------------------
         const bookDetails = await bookModel.findById(bookId)
         if (!bookDetails)
             return res.status(404).send({ status: false, message: "book with this id is not present in our DB" })
@@ -231,10 +241,10 @@ const deleteBook = async function (req, res) {
         if (bookDetails.isDeleted == true)
             return res.status(404).send({ status: false, message: "book is already deleted" })
 
-        //USING HERE MOMENT FOR DATE FORMAT.-------------------------------------------------------------
+        //--------------------------------------USING HERE MOMENT FOR DATE FORMAT.-------------------------------------------------------------
         let today = moment().format("YYYY-MM-DD", "hh-mm-ss a")
 
-        //UPDATING IS DELETED WITH UPDATED DATE.---------------------------------------------------------
+        //------------------------------UPDATING IS DELETED WITH UPDATED DATE.---------------------------------------------------------
         await bookModel.findOneAndUpdate({ _id: bookId },
             {
                 $set: {

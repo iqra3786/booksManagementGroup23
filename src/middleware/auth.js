@@ -1,6 +1,10 @@
+//.....................................ImportModules.........................................................................................................//
+
 const jwt = require('jsonwebtoken')
 const bookModel = require('../models/bookModel')
 const {isValidObjectId} = require('mongoose')
+
+//...................................Authentication...........................................................................................................//
 
 const authenticate = async function(req, res, next){
     try{
@@ -23,6 +27,8 @@ const authenticate = async function(req, res, next){
         return res.status(500).send({status:false, message:err.message})
     }
 }
+
+//...................................Authorization...............................................................................................................................//
 
 const authorization = async function(req, res ,next){
     try{

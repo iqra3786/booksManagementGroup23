@@ -1,8 +1,12 @@
+//.................................ImportModules...............................................................................................................//
+
 const userModel = require('../models/userModel')
 const validation = require('../validation/validation')
 const jwt = require("jsonwebtoken")
 
 const { isEmpty, isValidTitle, isValidPhone, isValidMail, isValidFullName, isValidPassword, isValidPincode } = validation
+
+//..................................CreateUser...............................................................................................................//
 
 const createUser = async function (req, res) {
     try {
@@ -67,6 +71,8 @@ const createUser = async function (req, res) {
     }
 }
 
+
+//.......................................Login................................................................................................//
 
 const login = async function (req, res) {
     try {
