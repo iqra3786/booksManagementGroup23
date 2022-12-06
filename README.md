@@ -1,4 +1,4 @@
-# book-management-project3-self
+# book-management-project3
 
 Key points
 Create a group database groupXDatabase. You can clean the db you previously used and resue that.
